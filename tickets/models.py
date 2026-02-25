@@ -50,3 +50,15 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"[{self.status}] {self.title} by {self.author.username}"
+    
+class TicketRemark(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="remarks")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Remark by {self.author.username} on Ticket #{self.ticket.id}"

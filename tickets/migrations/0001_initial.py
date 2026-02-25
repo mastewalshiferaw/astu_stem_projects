@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200)),
                 ('description', models.TextField()),
-                ('attachment', models.FileField(blank=True, null=True, upload_to='tickets/%Y/', validators=[tickets.models.validate_ticket_attachment])),
+                ('attachment', models.FileField(blank=True, null=True, upload_to='tickets/%Y/', validators=[tickets.models.validate_ticket_attachment                 ])),
                 ('status', models.CharField(choices=[('OPEN', 'Open'), ('IN_PROGRESS', 'In Progress'), ('RESOLVED', 'Resolved')], default='OPEN', max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='my_tickets', to=settings.AUTH_USER_MODEL)),
