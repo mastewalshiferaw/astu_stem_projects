@@ -7,13 +7,24 @@ from .serializers import TicketSerializer, CategorySerializer
 from .permissions import IsOwnerOrStaff
 from django.db.models import Count, Q
 from rest_framework.views import APIView
-
-
-
+from accounts.models import SecurityLog
 
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrStaff]
+
+
+    def get_object(self):
+        obj = super().get_object()
+        if self.request.user.role == 'STUDENT' and obj.author != self.request.user:
+            SecurityLog.objects.create(
+                user=self.request.user,
+                action=f"UNAUTHORIZED ACCESS ATTEMPT on Ticket #{obj.id}",
+                is_suspicious=True,
+                ip_address=self.request.META.get('REMOTE_ADDR')
+            )
+            return obj
+
 
     def get_queryset(self):
         user = self.request.user

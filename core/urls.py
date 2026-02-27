@@ -19,7 +19,7 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/chatbot/', include('chatbot.urls')),
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
+    path('api/notifications/', include('notifications.urls')),
+    path('api/auth/register/', RegisterView.as_view(), name='register'),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
