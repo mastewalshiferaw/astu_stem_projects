@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'tickets',
     'chatbot',
     'notifications',
+    'drf_spectacular',
     
 
 
@@ -160,3 +161,10 @@ DEBUG = os.getenv('DEBUG') == 'True'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
