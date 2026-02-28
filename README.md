@@ -1,27 +1,24 @@
 # 🎯 ASTU Smart Complaint & Issue Tracking System
 
-A professional, secure, and AI-enhanced platform for students at Adama Science and Technology University to report and track facility issues.
+A secure, full-stack issue management platform designed for Adama Science and Technology University.
 
 ## 🚀 Core Features
-- **Role-Based Access Control (RBAC):** Distinct workflows for Students, Staff, and Admins.
-- **Smart Ticket Management:** Status tracking from 'Open' to 'Resolved' with a full audit trail.
-- **AI Chatbot:** Context-aware assistant that suggests solutions before tickets are created.
-- **Live Analytics:** Admin dashboard for resolution rates and common issue hotspots.
-- **Security First:** Built-in protection against SQLi, XSS, and unauthorized data access.
+- **AI Chatbot:** Knowledge-base driven assistant for instant campus solutions.
+- **RBAC (Role-Based Access Control):** Dedicated views for Students, Staff, and Admins.
+- **Smart Workflow:** Automated notifications and audit trails for every ticket.
+- **Security Monitoring:** Real-time logging of unauthorized access attempts.
 
 ## 🛠 Tech Stack
-- **Backend:** Django, Django REST Framework (DRF)
-- **Database:** SQLite (Development) / PostgreSQL (Production ready)
+- **Backend:** Django, Django REST Framework
 - **Auth:** JWT (SimpleJWT)
-- **AI:** Custom Knowledge-Base matching logic
+- **Documentation:** Swagger UI / OpenAPI 3.0
+- **Deployment:** Render (Python 3.12)
 
-## 🔧 Installation & Setup
-1. Clone the repo: `git clone <your-repo-link>`
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run migrations: `python manage.py migrate`
-4. Start the server: `python manage.py runserver`
+## 🔧 Setup Instructions
+1. `pip install -r requirements.txt`
+2. `python manage.py migrate`
+3. `python manage.py seed_data`  <-- Important for the demo!
+4. `python manage.py runserver`
 
-## 🔒 Cyber Security Features
-- **Data Isolation:** Students can only access their own data via `get_queryset` overrides.
-- **Audit Logs:** Every suspicious unauthorized access attempt is logged in the `SecurityLog` table.
-- **File Validation:** Strict extension and size checking for attachments.
+## 🔗 Live API Documentation
+Visit: `https://your-app-name.onrender.com/` to view the interactive Swagger docs.
