@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from .models import SecurityLog
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -17,3 +18,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             phone_number=validated_data.get('phone_number', ''),
             role='STUDENT' )
         return user
+    
+
+class SecurityLogSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = SecurityLog
+        fields = ['id', 'username', 'action', 'ip_address', 'is_suspicious', 'timestamp']
