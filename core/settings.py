@@ -154,7 +154,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'a-fallback-key-for-local-dev')
 DEBUG = os.getenv('DEBUG') == 'True'
 
 STATIC_URL = '/static/'
