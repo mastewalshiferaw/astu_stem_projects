@@ -15,5 +15,5 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             department=validated_data.get('department', ''),
             phone_number=validated_data.get('phone_number', ''),
-            role='STUDENT' 
+            role='STUDENT' )
         return user
