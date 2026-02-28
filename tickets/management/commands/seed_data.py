@@ -14,11 +14,11 @@ class Command(BaseCommand):
         # Seed FAQ for Chatbot
         FAQ.objects.get_or_create(
             question="How do I reset my campus WiFi password?",
-            answer="Visit the ICT office in the Red Building, Room 204, with your ID card.",
+            answer="set with API 10.240.212.**, put any numbers instead of '**' and check the ASTU GENERAL telegram channel. You might found a lot information",
             category="Network"
         )
         FAQ.objects.get_or_create(
-            question="Water is leaking in my dorm room",
+            question="Water is leaking in our shower",
             answer="Submit a 'Dormitory Maintenance' ticket immediately via this app for Block repair.",
             category="Dormitory"
         )
