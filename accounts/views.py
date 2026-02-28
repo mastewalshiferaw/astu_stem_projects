@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets
 from .serializers import RegisterSerializer, SecurityLogSerializer
 from .models import SecurityLog
 
