@@ -22,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class SecurityLogSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source='user.username')
-
+    ip_address = serializers.CharField(read_only=True)
     class Meta:
         model = SecurityLog
         fields = ['id', 'username', 'action', 'ip_address', 'is_suspicious', 'timestamp']
