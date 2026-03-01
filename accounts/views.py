@@ -1,8 +1,9 @@
 from rest_framework import generics, permissions, viewsets
 from .serializers import RegisterSerializer, SecurityLogSerializer
-from .models import SecurityLog
+from .models import SecurityLog, User
 
 class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny] 
 
