@@ -41,7 +41,7 @@ class ASTUChatbotView(APIView):
             "response": bot_response
         })
 
- @extend_schema(request=ChatRequestSerializer, responses={200: dict})
+    @extend_schema(request=ChatRequestSerializer, responses={200: dict})
     def post(self, request):
         serializer = ChatRequestSerializer(data=request.data)
         if serializer.is_valid():
