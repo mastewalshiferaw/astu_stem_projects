@@ -8,11 +8,23 @@ from .permissions import IsOwnerOrStaff
 from django.db.models import Count, Q
 from rest_framework.views import APIView
 from accounts.models import SecurityLog
+from rest_framework.parsers import MultiPartParser, FormParser
+
+from drf_spectacular.utils import extend_schema
+
+
 
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrStaff]
+    
+    #so the swagger knows this handles files
+    parser_classes = (MultiPartParser, FormParser)
 
+    @extend_schema(operation_id="upload_ticket_with_file")
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     def get_object(self):
         obj = super().get_object()
