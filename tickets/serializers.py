@@ -9,6 +9,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     author_name = serializers.ReadOnlyField(source='author.username')
     category_name = serializers.ReadOnlyField(source='category.name')
+    # This explicitly tells Swagger to show the "Choose File" button
+    attachment = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         model = Ticket
