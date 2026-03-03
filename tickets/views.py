@@ -12,9 +12,26 @@ from .permissions import IsOwnerOrStaff
 from accounts.models import SecurityLog
 from chatbot.models import FAQ
 
+
 @extend_schema_view(
-    create=extend_schema(description="Submit a complaint with file support.", operation_id="upload_ticket"),
+    create=extend_schema(
+        operation_id="upload_ticket",
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'title': {'type': 'string'},
+                    'description': {'type': 'string'},
+                    'category': {'type': 'integer'},
+                    'attachment': {'type': 'string', 'format': 'binary'}, # FORCES FILE BUTTON
+                },
+                'required': ['title', 'description', 'category']
+            }
+        },
+        responses={201: TicketSerializer}
+    )
 )
+
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrStaff]
