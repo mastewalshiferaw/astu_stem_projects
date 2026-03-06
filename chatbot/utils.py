@@ -1,18 +1,23 @@
-import fuzzywuzzy.process as fuzzy # You might need: pip install fuzzywuzzy python-Levenshtein
+import fuzzywuzzy.process as fuzzy
 from .models import FAQ
 
 def get_astu_ai_response(user_query):
+    # 1. Check if we have any data
     faqs = FAQ.objects.all()
     if not faqs.exists():
-        return "I'm still learning about ASTU. Please submit a ticket for manual help."
+        return "I'm still learning about ASTU. (Hint: Visit Admin Analytics to seed data)"
 
-    # Logic: Find the most similar question in our database
+    # 2. Get all questions from the DB
     questions = [q.question for q in faqs]
-    # Simple similarity matching 
-    best_match, score = fuzzy.extractOne(user_query, questions)
-
-    if score > 70:
-        faq_item = FAQ.objects.get(question=best_match)
-        return f"I found a solution: {faq_item.answer}"
     
-    return "I'm not 100% sure about that. Would you like me to help you create a formal support ticket?"
+    # 3. Match user query against DB questions
+    # fuzzy.extractOne returns (string, score)
+    match_result = fuzzy.extractOne(user_query, questions)
+    
+    if match_result:
+        best_match, score = match_result
+        if score > 60: # Lowered threshold slightly for better matching
+            faq_item = FAQ.objects.get(question=best_match)
+            return f"Found a solution: {faq_item.answer}"
+    
+    return "I'm not sure about that. Try asking about 'WiFi' or 'Internet'."

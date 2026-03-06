@@ -13,6 +13,8 @@ from accounts.models import SecurityLog
 from chatbot.models import FAQ
 
 
+
+
 @extend_schema_view(
     create=extend_schema(
         operation_id="upload_ticket",
@@ -22,7 +24,7 @@ from chatbot.models import FAQ
                 'properties': {
                     'title': {'type': 'string'},
                     'description': {'type': 'string'},
-                    'category': {'type': 'integer'},
+                    'category': {'type': 'integer', 'description': 'ID 1 for Internet, 2 for Dorm'},
                     'attachment': {'type': 'string', 'format': 'binary'}, # FORCES FILE BUTTON
                 },
                 'required': ['title', 'description', 'category']
@@ -31,11 +33,10 @@ from chatbot.models import FAQ
         responses={201: TicketSerializer}
     )
 )
-
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrStaff]
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser) # REQUIRED FOR FILE BUTTON
 
     def get_queryset(self):
         user = self.request.user
@@ -44,12 +45,11 @@ class TicketViewSet(viewsets.ModelViewSet):
         return Ticket.objects.filter(author=user).order_by('-created_at')
 
     def perform_create(self, serializer):
-        # Automatically set the author to the logged-in user
+        # ONLY ONE perform_create method allowed!
         serializer.save(author=self.request.user)
 
     def get_object(self):
         obj = super().get_object()
-        # Security: Log suspicious access attempts
         if self.request.user.role == 'STUDENT' and obj.author != self.request.user:
             SecurityLog.objects.create(
                 user=self.request.user,
@@ -57,28 +57,23 @@ class TicketViewSet(viewsets.ModelViewSet):
                 is_suspicious=True,
                 ip_address=self.request.META.get('REMOTE_ADDR')
             )
-            # Permission classes will handle the actual blocking
         return obj
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def update_status(self, request, pk=None):
         ticket = self.get_object()
         if request.user.role not in ['STAFF', 'ADMIN']:
-            return Response({"error": "Only Staff can update status"}, status=403)
-
+            return Response({"error": "Unauthorized"}, status=403)
+        
         new_status = request.data.get('status')
         remark_text = request.data.get('remark')
-
         if new_status in Ticket.Status.values:
             ticket.status = new_status
             ticket.assigned_staff = request.user
             ticket.save()
-
             if remark_text:
-                TicketRemark.objects.create(
-                    ticket=ticket, author=request.user, comment=remark_text
-                )
-            return Response({"status": f"Ticket updated to {new_status}"})
+                TicketRemark.objects.create(ticket=ticket, author=request.user, comment=remark_text)
+            return Response({"status": "Updated"})
         return Response({"error": "Invalid status"}, status=400)
 
 class AdminAnalyticsView(APIView):
@@ -88,20 +83,23 @@ class AdminAnalyticsView(APIView):
         if request.user.role != 'ADMIN':
             return Response({"error": "Admin access required"}, status=403)
 
-        # --- AUTO-SEED LOGIC (Because you can't use Shell) ---
-        # If you visit this URL and the DB is empty, it fills it automatically!
+        # CRUCIAL: Seeding the FAQ so the Chatbot has answers
         if not Category.objects.exists():
             cats = ['Internet', 'Dormitory', 'Lab', 'Classroom']
             for c in cats: Category.objects.create(name=c)
-            FAQ.objects.get_or_create(question="WiFi Help", answer="Go to Red Building Room 204", category="Network")
         
-        total_tickets = Ticket.objects.count()
-        resolved_tickets = Ticket.objects.filter(status='RESOLVED').count()
-        resolution_rate = (resolved_tickets / total_tickets * 100) if total_tickets > 0 else 0
-        category_stats = Category.objects.annotate(num_tickets=Count('tickets')).order_by('-num_tickets')[:5]
+        # Ensure the Chatbot has the "WiFi" answer in the DB
+        if not FAQ.objects.filter(question__icontains="wifi").exists():
+            FAQ.objects.create(
+                question="How to reset WiFi password?",
+                answer="Visit the ICT office in the Red Building, Room 204.",
+                category="Network"
+            )
 
-        return Response({
+        total_tickets = Ticket.objects.count()
+        data = {
             "total_complaints": total_tickets,
-            "resolution_rate": f"{round(resolution_rate, 2)}%",
-            "common_issues": [{"category": c.name, "count": c.num_tickets} for c in category_stats],
-        })
+            "resolved_complaints": Ticket.objects.filter(status='RESOLVED').count(),
+            "status_breakdown": Ticket.objects.values('status').annotate(count=Count('status'))
+        }
+        return Response(data)
